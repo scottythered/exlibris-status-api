@@ -55,6 +55,6 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 
 13. Serverless will run for a while, packaging your stuff and deploying it to AWS. Eventually you should end up with a message in your CLI like the one below.  
 
- ![serverless response](https://bitbucket.org/asulibraries/exlibris-status-api/raw/111d148750f655c7fc5a61b20accb6ae1a6c1de4/img/cli.png)
+ ![serverless response](https://raw.githubusercontent.com/scottythered/exlibris-status-api/master/img/cli.png)
 
 The listed GET endpoint will let you access the data parsed from the ExL API. Depending on how often you've set it to run, you can now call this endpoint and get updated, parsed data about your Primo servers. Cool, huh?
