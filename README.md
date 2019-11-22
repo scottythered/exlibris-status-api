@@ -61,4 +61,21 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 
  ![serverless response](https://raw.githubusercontent.com/scottythered/exlibris-status-api/master/img/cli.png)
 
-The listed GET endpoint will let you access the data parsed from the ExL API. Depending on how often you've set it to run, you can now call this endpoint and get updated, parsed data about your Primo servers. Cool, huh?
+The listed GET endpoint will let you access the data parsed from the ExL API. Depending on how often you've set it to run, you can now call this endpoint and get updated, parsed data about your Primo servers:
+
+```
+{ 
+   "affected_env":"Production",
+   "product":"Primo",
+   "maintenance":true,
+   "service_status":"OK, Maintenance Scheduled",
+   "last_update":"2019-11-22 13:50",
+   "maintenance_message":"Due to routine maintenance, Library One Search may be unavailable between Nov 23 at 23:00 and Nov 24 at 03:00, Phoenix time. We apologize for the inconvenience.",
+   "maintenance_date":"2019-11-23",
+   "system_id":"Primo MT NA04",
+   "raw_api_response":"<?xml version='1.0' ?><exlibriscloudstatus><instance id='Primo MT NA04' service='Primo' region='North America' status='OK'><schedule>28-Nov-2019 UTC 6:00:00<br />\nDear Ex Libris Customer,<br />\n<br />\nAs part of our ongoing  ...
+}
+```
+
+
+Cool, huh?
