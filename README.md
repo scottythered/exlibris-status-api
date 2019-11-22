@@ -39,9 +39,7 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 
 8. Next, for this to work, you'll need to set up an existing DynamoDB. Log into AWS and open the DynamoDB product page; under Dashboard, click `Creat Table`. Give your table a name, and under Primary key/Partition key, enter `product` as a `string`. Then click `Create Table`.
 
-9. The, we'll need to create a single item (row) in this DB, which will be constantly updated and overwritten. (You'll only have one item (row) here, for now at least, because we're only checking on one product (Primo) and it has one server.) In your new table, click on `Items`, then `Create Item`.  
-
- In the `Create Item` window, click on the left-hand dropdown and switch the view from `Tree` to `Text`. Tick the `DynamoDB JSON` box and paste the contents of the repo file `dynamo_starter.json` into the window. Click `Save`.
+9. Then, we'll need to create a single item (row) in this DB, which will be constantly updated and overwritten. (You'll only have one item (row) here, for now at least, because we're only checking on one product (Primo) and it has one server.) In your new table, click on `Items`, then `Create Item`. In the `Create Item` window, click on the left-hand dropdown and switch the view from `Tree` to `Text`. Tick the `DynamoDB JSON` box and paste the contents of the repo file `dynamo_starter.json` into the window. Click `Save`.
 
 10. Both of our handler Python scripts () need to know which DynamoDB table they're supposed to use. Enter your table name in this line in both scripts:  
  ```python
