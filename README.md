@@ -1,24 +1,29 @@
-# exLibris-status-api
+# Ex Libris Server Status API
 This project tracks Primo server statuses by parsing [an API provided by Ex Libris](https://knowledge.exlibrisgroup.com/Cross_Product/Knowledge_Articles/RESTful_API_for_Ex_Libris_system_status).
 
 While ultimately helpful, ExL's RESTful system status API returns a horrifying mess of data; rather than returning discrete chunks of information about the maintenance status of your server(s), the API provides the same HTML-formatted text sent out via email to server users, wrapped in XML. Depending on maintenance status, the tree structure of the XML fluctuates, either providing empty XML elements, of leaving elements out completely.
 
 The goal of this project is to parse that API status call into something more granular that can be used internally, such as automatically generating a maintenance alert banner in the Primo UI (or your library's website) or notifying unexpected outages via Twitter or Slack.
+
 ## How it Works
 The project uses the [serverless framework](https://serverless.com/) to spin up two AWS lambdas: one for interacting with the ExL API & storing the parsed data (in a DynamoDB), and another that creates an endpoint supporting GET requests of the DynamoDB. The former lambda function is set to run every 10 minutes. (You can change this in the repo's `serverless.yml` file if you want more or fewer interactions with ExL's API.)
+
 ## Requirements
 - NodeJS
 - Python 3.6+
 - AWS access
 - Docker (used to compile Python packages in a container before shipping the package to AWS)
+
 ### Python Dependencies
 - boto3
 - lxml
 - requests
 - awscli
+
 ### Node Dependencies
 - serverless
 - serverless-python-requirements (plugin that uses Docker)
+
 ## Instructions
 1. Download/clone this repository.
 
@@ -35,6 +40,7 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 8. Next, for this to work, you'll need to set up an existing DynamoDB. Log into AWS and open the DynamoDB product page; under Dashboard, click `Creat Table`. Give your table a name, and under Primary key/Partition key, enter `product` as a `string`. Then click `Create Table`.
 
 9. The, we'll need to create a single item (row) in this DB, which will be constantly updated and overwritten. (You'll only have one item (row) here, for now at least, because we're only checking on one product (Primo) and it has one server.) In your new table, click on `Items`, then `Create Item`.  
+
  In the `Create Item` window, click on the left-hand dropdown and switch the view from `Tree` to `Text`. Tick the `DynamoDB JSON` box and paste the contents of the repo file `dynamo_starter.json` into the window. Click `Save`.
 
 10. Both of our handler Python scripts () need to know which DynamoDB table they're supposed to use. Enter your table name in this line in both scripts:  
