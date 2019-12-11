@@ -84,7 +84,7 @@ def handler(event, context):
         aws_access_key_id=os.environ["access_key"],
         aws_secret_access_key=os.environ["secret_access"],
     )
-    table = dynamodb.Table("XXX")
+    table = dynamodb.Table(os.environ["table"])
     response = table.get_item(Key={"product": "Primo"})
 
     # if status is the same, only change the update date; if different, update entire DynamoDB entry

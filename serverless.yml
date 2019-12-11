@@ -23,10 +23,13 @@ service: exlib-status-api
 provider:
   name: aws
   runtime: python3.7
+  region: ${file(auth.json):region_name}
+  stage: dev
   environment:
     access_key: ${file(auth.json):aws_access_key_id}
     secret_access: ${file(auth.json):aws_secret_access_key}
     region_name: ${file(auth.json):region_name}
+    table: ${file(auth.json):table}
 
 # you can overwrite defaults here
 #  stage: dev
@@ -72,6 +75,7 @@ functions:
       - http:
           path: /
           method: get
+          cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -125,7 +129,6 @@ functions:
 #       Value: "Some output value"
 plugins:
   - serverless-python-requirements
-
 custom:
   pythonRequirements:
     dockerizePip: true
