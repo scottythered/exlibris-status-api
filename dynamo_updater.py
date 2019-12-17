@@ -149,13 +149,13 @@ def handler(event, context):
                 asu_api["maintenance_message"] = (
                     "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
                     "We apologize for the inconvenience.".format(
-                        (asu_api["maintenance_start"]).strftime("%b %d at %H:%M"),
-                        (asu_api["maintenance_stop"]).strftime("%b %d at %H:%M"),
+                        (asu_api["maintenance_start"]).strftime("%b %d at %I:%M %p"),
+                        (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
                     )
                 )
-                asu_api["maintenance_date"] = (asu_api["maintenance_start"]).strftime(
-                    "%Y-%m-%d"
-                )
+                asu_api["maintenance_date"] = (
+                    message_time_parse(parsed_exlib_api_status, "start")
+                ).strftime("%Y-%m-%d %H:%M")
 
             elif len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) > 1:
                 temp = []
@@ -185,13 +185,13 @@ def handler(event, context):
                 asu_api["maintenance_message"] = (
                     "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
                     "We apologize for the inconvenience.".format(
-                        (asu_api["maintenance_start"]).strftime("%b %d at %H:%M"),
-                        (asu_api["maintenance_stop"]).strftime("%b %d at %H:%M"),
+                        (asu_api["maintenance_start"]).strftime("%b %d at %I:%M %p"),
+                        (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
                     )
                 )
-                asu_api["maintenance_date"] = (asu_api["maintenance_start"]).strftime(
-                    "%Y-%m-%d"
-                )
+                asu_api["maintenance_date"] = (
+                    message_time_parse(parsed_exlib_api_status, "start")
+                ).strftime("%Y-%m-%d %H:%M")
             else:
                 asu_api["service_status"] = "OK"
                 asu_api["maintenance"] = False
@@ -217,13 +217,13 @@ def handler(event, context):
             asu_api["maintenance_message"] = (
                 "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
                 "We apologize for the inconvenience.".format(
-                    (asu_api["maintenance_start"]).strftime("%b %d at %H:%M"),
-                    (asu_api["maintenance_stop"]).strftime("%b %d at %H:%M"),
+                    (asu_api["maintenance_start"]).strftime("%b %d at %I:%M %p"),
+                    (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
                 )
             )
-            asu_api["maintenance_date"] = (asu_api["maintenance_start"]).strftime(
-                "%Y-%m-%d"
-            )
+            asu_api["maintenance_date"] = (
+                message_time_parse(parsed_exlib_api_status, "start")
+            ).strftime("%Y-%m-%d %H:%M")
             try:
                 env = re.search(
                     "on your Primo (Sandbox|Production) environment",
@@ -263,10 +263,15 @@ def handler(event, context):
                     asu_api["maintenance_message"] = (
                         "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
                         "We apologize for the inconvenience.".format(
-                            (asu_api["maintenance_start"]).strftime("%b %d at %H:%M"),
-                            (asu_api["maintenance_stop"]).strftime("%b %d at %H:%M"),
+                            (asu_api["maintenance_start"]).strftime(
+                                "%b %d at %I:%M %p"
+                            ),
+                            (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
                         )
                     )
+                    asu_api["maintenance_date"] = (
+                        message_time_parse(parsed_exlib_api_status, "start")
+                    ).strftime("%Y-%m-%d %H:%M")
                 else:
                     asu_api["service_status"] = "OK, Maintenance Completed"
                     asu_api["affected_env"] = "NA"
