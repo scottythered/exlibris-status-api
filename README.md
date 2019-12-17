@@ -19,7 +19,7 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 ### Node Dependencies
 - serverless
 - serverless-python-requirements (a plugin that uses Docker)
-## Instructions
+## How to Use This
 1. Download/clone this repository.
 
 2. If you haven't installed serverless yet, run: `npm install -g serverless`
@@ -48,10 +48,44 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 
 10. Make sure Docker is also up and running, then run: `sls deploy`
 
-13. Serverless will run for a while, packaging up your stuff and deploying it to AWS. Eventually you should end up with a message in your CLI like the one below.  
+11. Serverless will run for a while, packaging up your stuff and deploying it to AWS. Eventually you should end up with a message in your CLI like the one below.  
 
- ![serverless response](https://bitbucket.org/asulibraries/exlibris-status-api/raw/111d148750f655c7fc5a61b20accb6ae1a6c1de4/img/cli.png)
+ ![serverless response](https://raw.githubusercontent.com/scottythered/exlibris-status-api/master/img/cli.png)
 
-The listed GET endpoint will let you access the data parsed from the ExL API. Depending on how often you've set it to run, you can now call this endpoint and get updated, parsed data about your Primo servers.
+The listed GET endpoint will let you access the data parsed from the ExL API. For example, when no maintenance is scheduled, the result will look like this:
+
+```
+{
+  "affected_env": "NA",
+  "product": "Primo",
+  "maintenance": false,
+  "service_status": "OK",
+  "last_update": "2019-12-17 14:32",
+  "maintenance_message": "NA",
+  "maintenance_date": "NA",
+  "system_id": "Primo MT NA04",
+  ...
+}
+```
+
+But when a maintenance message is posted:
+
+```
+{
+  "affected_env": "Production",
+  "product": "Primo",
+  "maintenance": true,
+  "service_status": "OK, Maintenance Scheduled",
+  "last_update": "2019-12-17 14:27",
+  "maintenance_message": "Due to routine maintenance, Library One Search may be unavailable between Nov 09 at 11:00 PM and Nov 10 at 03:00 AM, Phoenix time. We apologize for the inconvenience.",
+  "maintenance_date": "2019-11-10 06:00",
+  "system_id": "Primo MT NA04",
+  ...
+}
+```
+
+This can be used to, say automatically generate a maintenance banner within primo:
+
+![banner example](https://raw.githubusercontent.com/scottythered/exlibris-status-api/master/img/banner.png)
 
 Cool, huh?
