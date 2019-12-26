@@ -8,6 +8,7 @@ from datetime import datetime
 from dateutil import tz
 import boto3
 import os
+from more_itertools import unique_everseen
 
 
 def utc_time_now():
@@ -38,35 +39,22 @@ def message_time_parse(text, mode):
         raise NameError("Time mode not understood")
 
 
-def matcherator(pattern, text):
-    if pattern == "front":
-        regex_pattern = r"\d\d\-[a-zA-z]{3}\-\d{4} UTC \d{1,2}\:\d{2}\:\d{2}"
-    elif pattern == "back":
-        regex_pattern = r"Ex Libris Cloud Services"
-    matches = re.findall(regex_pattern, text)
-    if len(matches) >= 1:
-        counter = 1
-        if pattern == "front":
-            for match in matches:
-                text = text.replace(
-                    match, ("<match_{0}>{1}".format(str(counter), match))
-                )
-                counter += 1
-        elif pattern == "back":
-            for match in matches:
-                text = text.replace(
-                    match, ("</match_{1}>".format(match, str(counter))), 1
-                )
-                counter += 1
-        return text
-    else:
-        return text
-
-
 def changeomatic(raw_input):
-    first_pass = matcherator("front", raw_input)
-    second_pass = matcherator("back", first_pass)
-    return second_pass
+    raw_root = etree.fromstring(raw_input)
+    api_data = (raw_root.xpath("/exlibriscloudstatus/instance/schedule")[0]).text
+    new_list = api_data.split(" Regards, Ex Libris Cloud Services")
+    new_list = [i.strip() for i in new_list]
+    new_list = [i for i in new_list if i != ""]
+    deduped = list(unique_everseen(new_list))
+    counter = 1
+    revamped_status = ""
+    for i in deduped:
+        revamped_status = revamped_status + "<match{0}>{1}</match{0}>".format(
+            str(counter), deduped[0]
+        )
+        counter += 1
+    new_parsed_exlib_api_status = raw_input.replace(api_data, revamped_status)
+    return new_parsed_exlib_api_status
 
 
 def handler(event, context):
@@ -154,7 +142,7 @@ def handler(event, context):
                     )
                 )
                 asu_api["maintenance_date"] = (
-                    message_time_parse(parsed_exlib_api_status, "start")
+                    message_time_parse(changed_exlib_api_status, "start")
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
 
             elif len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) > 1:
@@ -190,7 +178,7 @@ def handler(event, context):
                     )
                 )
                 asu_api["maintenance_date"] = (
-                    message_time_parse(parsed_exlib_api_status, "start")
+                    message_time_parse(earliest_exlib_api_status, "start")
                 ).strftime("%Y-%m-%dT%H:%M:%SZ")
             else:
                 asu_api["service_status"] = "OK"
