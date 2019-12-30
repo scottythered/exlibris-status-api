@@ -118,69 +118,90 @@ def handler(event, context):
             and len(root.xpath("/exlibriscloudstatus/instance/schedule")) == 1
             and len(root.xpath("/exlibriscloudstatus/instance/message")) == 0
         ):
-            changed_exlib_api_status = changeomatic(parsed_exlib_api_status)
-            new_root = etree.fromstring(changed_exlib_api_status)
-            if len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) == 1:
-                env = re.search(
-                    "we will be performing the following maintenance on your (Sandbox|Production) environment",
-                    changed_exlib_api_status,
-                )
-                asu_api["affected_env"] = env.group(1)
-                asu_api["service_status"] = "OK, Maintenance Scheduled"
-                asu_api["maintenance"] = True
-                asu_api["maintenance_start"] = utc_to_phoenix_time(
-                    message_time_parse(changed_exlib_api_status, "start")
-                )
-                asu_api["maintenance_stop"] = utc_to_phoenix_time(
-                    message_time_parse(changed_exlib_api_status, "stop")
-                )
-                asu_api["maintenance_message"] = (
-                    "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
-                    "We apologize for the inconvenience.".format(
-                        (asu_api["maintenance_start"]).strftime("%b %d at %I:%M %p"),
-                        (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
+            try:
+                changed_exlib_api_status = changeomatic(parsed_exlib_api_status)
+                new_root = etree.fromstring(changed_exlib_api_status)
+                if len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) == 1:
+                    env = re.search(
+                        "we will be performing the following maintenance on your (Sandbox|Production) environment",
+                        changed_exlib_api_status,
                     )
-                )
-                asu_api["maintenance_date"] = (
-                    message_time_parse(changed_exlib_api_status, "start")
-                ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                    asu_api["affected_env"] = env.group(1)
+                    asu_api["service_status"] = "OK, Maintenance Scheduled"
+                    asu_api["maintenance"] = True
+                    asu_api["maintenance_start"] = utc_to_phoenix_time(
+                        message_time_parse(changed_exlib_api_status, "start")
+                    )
+                    asu_api["maintenance_stop"] = utc_to_phoenix_time(
+                        message_time_parse(changed_exlib_api_status, "stop")
+                    )
+                    asu_api["maintenance_message"] = (
+                        "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
+                        "We apologize for the inconvenience.".format(
+                            (asu_api["maintenance_start"]).strftime(
+                                "%b %d at %I:%M %p"
+                            ),
+                            (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
+                        )
+                    )
+                    asu_api["maintenance_date"] = (
+                        message_time_parse(changed_exlib_api_status, "start")
+                    ).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            elif len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) > 1:
-                temp = []
-                prog = re.compile(r"\d\d-[a-zA-z]{3}-\d{4} UTC \d{1,2}:\d{2}:\d{2}")
-                for found in new_root.xpath("/exlibriscloudstatus/instance/schedule/*"):
-                    result = prog.match(found.text)
-                    dash_stripped = (result[0]).split(" ")[0]
-                    time_obj = datetime.strptime(dash_stripped, "%d-%b-%Y")
-                    temp.append(time_obj)
-                index = temp.index(min(temp))
-                earliest_exlib_api_status = (
-                    new_root.xpath("/exlibriscloudstatus/instance/schedule/*")[index]
-                ).text
-                env = re.search(
-                    "we will be performing the following maintenance on your (Sandbox|Production) environment",
-                    earliest_exlib_api_status,
-                )
-                asu_api["affected_env"] = env.group(1)
-                asu_api["service_status"] = "OK, Maintenance Scheduled"
-                asu_api["maintenance"] = True
-                asu_api["maintenance_start"] = utc_to_phoenix_time(
-                    message_time_parse(earliest_exlib_api_status, "start")
-                )
-                asu_api["maintenance_stop"] = utc_to_phoenix_time(
-                    message_time_parse(earliest_exlib_api_status, "stop")
-                )
-                asu_api["maintenance_message"] = (
-                    "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
-                    "We apologize for the inconvenience.".format(
-                        (asu_api["maintenance_start"]).strftime("%b %d at %I:%M %p"),
-                        (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
+                elif (
+                    len(new_root.xpath("/exlibriscloudstatus/instance/schedule/*")) > 1
+                ):
+                    temp = []
+                    prog = re.compile(r"\d\d-[a-zA-z]{3}-\d{4} UTC \d{1,2}:\d{2}:\d{2}")
+                    for found in new_root.xpath(
+                        "/exlibriscloudstatus/instance/schedule/*"
+                    ):
+                        result = prog.match(found.text)
+                        dash_stripped = (result[0]).split(" ")[0]
+                        time_obj = datetime.strptime(dash_stripped, "%d-%b-%Y")
+                        temp.append(time_obj)
+                    index = temp.index(min(temp))
+                    earliest_exlib_api_status = (
+                        new_root.xpath("/exlibriscloudstatus/instance/schedule/*")[
+                            index
+                        ]
+                    ).text
+                    env = re.search(
+                        "we will be performing the following maintenance on your (Sandbox|Production) environment",
+                        earliest_exlib_api_status,
                     )
-                )
-                asu_api["maintenance_date"] = (
-                    message_time_parse(earliest_exlib_api_status, "start")
-                ).strftime("%Y-%m-%dT%H:%M:%SZ")
-            else:
+                    asu_api["affected_env"] = env.group(1)
+                    asu_api["service_status"] = "OK, Maintenance Scheduled"
+                    asu_api["maintenance"] = True
+                    asu_api["maintenance_start"] = utc_to_phoenix_time(
+                        message_time_parse(earliest_exlib_api_status, "start")
+                    )
+                    asu_api["maintenance_stop"] = utc_to_phoenix_time(
+                        message_time_parse(earliest_exlib_api_status, "stop")
+                    )
+                    asu_api["maintenance_message"] = (
+                        "Due to routine maintenance, Library One Search may be unavailable between {0} and {1}, Phoenix time. "
+                        "We apologize for the inconvenience.".format(
+                            (asu_api["maintenance_start"]).strftime(
+                                "%b %d at %I:%M %p"
+                            ),
+                            (asu_api["maintenance_stop"]).strftime("%b %d at %I:%M %p"),
+                        )
+                    )
+                    asu_api["maintenance_date"] = (
+                        message_time_parse(earliest_exlib_api_status, "start")
+                    ).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+                else:
+                    asu_api["service_status"] = "OK"
+                    asu_api["maintenance"] = False
+                    asu_api["affected_env"] = "NA"
+                    asu_api["maintenance_start"] = "NA"
+                    asu_api["maintenance_stop"] = "NA"
+                    asu_api["maintenance_message"] = "NA"
+                    asu_api["maintenance_date"] = "NA"
+
+            except:
                 asu_api["service_status"] = "OK"
                 asu_api["maintenance"] = False
                 asu_api["affected_env"] = "NA"
@@ -267,6 +288,7 @@ def handler(event, context):
                     asu_api["maintenance_start"] = "NA"
                     asu_api["maintenance_stop"] = "NA"
                     asu_api["maintenance_message"] = "NA"
+                    asu_api["maintenance_date"] = "NA"
 
             except:
                 asu_api["service_status"] = "OK, Maintenance Completed"
@@ -275,6 +297,7 @@ def handler(event, context):
                 asu_api["maintenance_start"] = "NA"
                 asu_api["maintenance_stop"] = "NA"
                 asu_api["maintenance_message"] = "NA"
+                asu_api["maintenance_date"] = "NA"
 
         else:
             asu_api["service_status"] = "unknown"
