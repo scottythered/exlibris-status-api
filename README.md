@@ -34,7 +34,7 @@ The project uses the [serverless framework](https://serverless.com/) to spin up 
 
 7. The, we'll need to create a single item (row) in this DB, which will be constantly updated and overwritten. (You'll only have one item (row) here, for now at least, because we're only checking on one product (Primo) and it has one server.) In your new table, click on `Items`, then `Create Item`. In the `Create Item` window, click on the left-hand dropdown and switch the view from `Tree` to `Text`. Tick the `DynamoDB JSON` box and paste the contents of the repo file `dynamo_starter.json` into the window. Click `Save`.
 
-8. Enter your AWS credentials, server region, and DynamoDB table name in `auth.json`. The lambda functions will use these credentials each time they're run.
+8. Enter your AWS credentials, server region, DynamoDB table name, and [your local time zone's TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) in `auth.json`. The lambda functions will use these each time the lambdas are run.
 
 9. The Python handler for interacting with the ExL API is by default set to the `Primo MT NA04` server here in `dynamo_updater.py`:
 

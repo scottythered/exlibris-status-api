@@ -30,6 +30,7 @@ provider:
     secret_access: ${file(auth.json):aws_secret_access_key}
     region_name: ${file(auth.json):region_name}
     table: ${file(auth.json):table}
+    local_timezone: ${file(auth.json):local_timezone}
 
 # you can overwrite defaults here
 #  stage: dev
