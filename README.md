@@ -1,7 +1,7 @@
 # exLibris-status-api
 This project tracks Primo server statuses by parsing [an API provided by Ex Libris](https://knowledge.exlibrisgroup.com/Cross_Product/Knowledge_Articles/RESTful_API_for_Ex_Libris_system_status).
 
-While ultimately helpful, ExL's RESTful system status API returns a horrifying mess of data; rather than returning discrete chunks of information about the maintenance status of your server(s), the API provides the same HTML-formatted text sent out via email to server users, wrapped in XML. Depending on maintenance status, the tree structure of the XML fluctuates, either providing empty XML elements, of leaving elements out completely.
+While ultimately helpful, ExL's RESTful system status API needs some heavy parsing. Rather than returning discrete chunks of information about the maintenance status of your server(s), the API provides the same HTML-formatted text sent out via email to server users, wrapped in XML. Depending on maintenance status, the tree structure of the XML fluctuates, either providing empty XML elements, of leaving elements out completely.
 
 The goal of this project is to parse that API status call into something more granular that can be used internally, such as automatically generating a maintenance alert banner in the Primo UI (or your library's website) or notifying unexpected outages via Twitter or Slack.
 ## How it Works
